@@ -1,0 +1,46 @@
+{
+  "foo": {
+    "keys": [
+      "foo_0",
+      "foo_1",
+      "foo_2",
+      "foo_3",
+      "foo_4",
+      "foo_5",
+      "foo_6",
+      "foo_7",
+      "foo_8",
+      "foo_9",
+      "foo_10",
+      "foo_11"
+    ],
+    "actions": [
+      "fii_0",
+      "fii_1",
+      "fii_2",
+      "fii_3",
+      "fii_4",
+      "fii_5",
+      "fii_6",
+      "fii_7",
+      "fii_8",
+      "fii_9",
+      "fii_10",
+      "fii_11"
+    ],
+    "values": [
+      "bar_0",
+      "bar_1",
+      "bar_2",
+      "bar_3",
+      "bar_4",
+      "bar_5",
+      "bar_6",
+      "bar_7",
+      "bar_8",
+      "bar_9",
+      "bar_10",
+      "bar_11"
+    ]
+  }
+}
