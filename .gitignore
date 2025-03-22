@@ -1,3 +1,4 @@
 /.idea
 /macropad/*.uf2
 /macropad/lib/
+/src/padbox.egg-info/

@@ -6,7 +6,7 @@ import subprocess
 import sys
 import time
 
-from comm import Box
+from .comm import Box
 
 
 class Boxer:
@@ -14,6 +14,8 @@ class Boxer:
         self.box = Box(tty, verbose)
         with open(os.path.expanduser(config_file)) as j:
             self.configs = json.load(j)
+        if title is None:
+            title = list(self.configs.keys())[0]
         if title not in self.configs:
             raise ValueError("Title is not in config file")
         self.title = title
@@ -48,26 +50,3 @@ class Boxer:
         except FileNotFoundError as e:
             if self.verbose:
                 print(f"Error, no such program or file: {e}")
-
-
-if __name__ == "__main__":
-    ttys = [f"/dev/{_d}" for _d in os.listdir("/dev") if _d.startswith("ttyACM")]
-    if not ttys:
-        print("No device detected")
-        sys.exit(1)
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--tty",
-        "-p",
-        help="TTY path of your device",
-        choices=ttys,
-        default=ttys[0] if len(ttys) == 1 else None,
-    )
-    parser.add_argument("--config-file", "-c", help="Path of the config file")
-    parser.add_argument("--title", "-t", help="Title of the config to use")
-    parser.add_argument("--verbose", "-v", help="print verbose", action="store_true")
-    parser.add_argument("--no-stdout", "-O", help="don't suppress stdout of subprocesses", action="store_false")
-    parser.add_argument("--no-stderr", "-E", help="don't suppress stderr of subprocesses", action="store_false")
-    args = parser.parse_args()
-    b = Boxer(**vars(args))
-    sys.exit(b.run())

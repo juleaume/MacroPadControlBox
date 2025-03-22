@@ -15,6 +15,20 @@
       "foo_11"
     ],
     "actions": [
+      "echo",
+      "echo",
+      "echo",
+      "echo",
+      "echo",
+      "echo",
+      "echo",
+      "echo",
+      "echo",
+      "echo",
+      "echo",
+      "echo"
+    ],
+    "values": [
       "fii_0",
       "fii_1",
       "fii_2",
@@ -27,20 +41,6 @@
       "fii_9",
       "fii_10",
       "fii_11"
-    ],
-    "values": [
-      "bar_0",
-      "bar_1",
-      "bar_2",
-      "bar_3",
-      "bar_4",
-      "bar_5",
-      "bar_6",
-      "bar_7",
-      "bar_8",
-      "bar_9",
-      "bar_10",
-      "bar_11"
     ]
   }
 }
