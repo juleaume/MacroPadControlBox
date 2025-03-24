@@ -10,5 +10,6 @@ setup(
     author="juleaume",
     author_email="",
     description="",
-    install_requires=["pyserial==3.5"]
+    install_requires=["pyserial==3.5"],
+    entry_points={"console_scripts": ["padbox = padbox.__main__:main"]},
 )

@@ -21,6 +21,9 @@ parser.add_argument("--title", "-t", help="Title of the config to use")
 parser.add_argument("--verbose", "-v", help="print verbose", action="store_true")
 parser.add_argument("--no-stdout", "-O", help="don't suppress stdout of subprocesses", action="store_false")
 parser.add_argument("--no-stderr", "-E", help="don't suppress stderr of subprocesses", action="store_false")
-args = parser.parse_args()
-b = Boxer(**vars(args))
-sys.exit(b.run())
+
+
+def main():
+    args = parser.parse_args()
+    b = Boxer(**vars(args))
+    sys.exit(b.run())
