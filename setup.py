@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name="padbox",
-    version="0.0.0",
+    version="0.1.0",
     packages=["padbox"],
     package_dir={"": "src"},
     url="",
