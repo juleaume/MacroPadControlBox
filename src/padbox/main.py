@@ -1,9 +1,9 @@
-import argparse
 import json
 import os
 import shlex
 import subprocess
 import sys
+import threading
 import time
 
 from .comm import Box
@@ -42,11 +42,15 @@ class Boxer:
         if self.verbose:
             print(f"Key pressed: {self.config["keys"][key_index]} " f"-> setting {action}({value})")
         try:
-            subprocess.run(
-                shlex.split(f"{action} {value}"),
-                stdout=subprocess.DEVNULL if self.supress_stdout else sys.stdout,
-                stderr=subprocess.DEVNULL if self.supress_stderr else sys.stderr,
-            )
+            threading.Thread(
+                target=subprocess.run,
+                args=[shlex.split(f"{action} {value}")],
+                kwargs={
+                    "stdout": subprocess.DEVNULL if self.supress_stdout else sys.stdout,
+                    "stderr": subprocess.DEVNULL if self.supress_stderr else sys.stderr,
+                },
+                daemon=True,
+            ).start()
         except FileNotFoundError as e:
             if self.verbose:
                 print(f"Error, no such program or file: {e}")
