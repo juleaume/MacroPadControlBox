@@ -16,7 +16,7 @@ parser.add_argument(
     choices=ttys,
     default=ttys[0] if len(ttys) == 1 else None,
 )
-parser.add_argument("--config-file", "-c", help="Path of the config file", required=True)
+parser.add_argument("--config-file", "-c", help="Path of the config file", default="~/.local/share/padbox.json")
 parser.add_argument("--title", "-t", help="Title of the config to use")
 parser.add_argument("--verbose", "-v", help="print verbose", action="store_true")
 parser.add_argument("--no-stdout", "-O", help="don't suppress stdout of subprocesses", action="store_false")
