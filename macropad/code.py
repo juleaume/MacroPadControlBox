@@ -68,6 +68,8 @@ class Console(MacroPad):  # type: ignore
         for i, _ in enumerate(self.group):
             self.group[i].text = ""
         self.group[-1].text = self.title
+        for i, _ in enumerate(self.pixels):
+            self.pixels[i] = 0
         tone = 1760
         for _ in range(3):
             self.play_tone(tone, 0.1)
