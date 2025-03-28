@@ -1,4 +1,3 @@
-import os
 import time
 from math import cos, pi
 
@@ -8,7 +7,6 @@ import usb_cdc
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
 from adafruit_macropad import MacroPad
-from adafruit_hid.consumer_control_code import ConsumerControlCode
 
 WHITE = 0xFFFFFF
 BLACK = 0x000000
