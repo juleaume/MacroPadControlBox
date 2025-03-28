@@ -70,30 +70,37 @@ class Console(MacroPad):  # type: ignore
         self.group[-1].text = self.title
         for i, _ in enumerate(self.pixels):
             self.pixels[i] = 0
+
+    def jingle(self):
         tone = 1760
         for _ in range(3):
             self.play_tone(tone, 0.1)
             tone /= 2
 
+    def set_screen(self, payload: bytes) -> bool:
+        print(f"Received {payload}")
+        if not payload.startswith(b"\x05"):
+            return False
+        payload = payload[1:]
+        try:
+            items = payload.decode().split(",")
+            title, *items = items
+            self.group[-1].text = title
+            for i, item in enumerate(items):
+                self.group[i].text = item
+            return True
+        except Exception as e:
+            print(f"Something went wrong: {e}")
+            return False
+
     def init_connection(self) -> bool:
         print("init connection...")
         dots = ""
-        indicator = "."
+        indicator = "+"
         while True:
             size = usb_cdc.data.in_waiting
             if size:
-                payload = usb_cdc.data.read(size)
-                print(f"Received {payload}")
-                try:
-                    items = payload.decode().split(",")
-                    title, *items = items
-                    self.group[-1].text = title
-                    for i, item in enumerate(items):
-                        self.group[i].text = item
-                    return True
-                except Exception as e:
-                    print(f"Something went wrong: {e}")
-                    return False
+                return self.set_screen(usb_cdc.data.read(size))
             else:
                 self.group[3].text = f"connecting{dots}"
                 if dots != "...":
@@ -101,12 +108,10 @@ class Console(MacroPad):  # type: ignore
                 else:
                     dots = ""
                 self.group[5].text = indicator
-                if indicator == ".":
-                    indicator = "o"
-                elif indicator == "o":
-                    indicator = "O"
-                elif indicator == "O":
-                    indicator = "."
+                if indicator == "+":
+                    indicator = "x"
+                else:
+                    indicator = "+"
             time.sleep(0.5)
 
     def run(self) -> None:
@@ -132,13 +137,13 @@ class Console(MacroPad):  # type: ignore
                 color_angle += pi / 36
             # ENCODER
             if self.encoder_switch and not last_encoder_switch:
-                self.consumer_control.send(ConsumerControlCode.PLAY_PAUSE)
+                usb_cdc.data.write(b".")
             last_encoder_switch = self.encoder_switch
             if encoder != last_encoder:
                 if encoder - last_encoder > 0:
-                    self.consumer_control.send(ConsumerControlCode.VOLUME_INCREMENT)
+                    usb_cdc.data.write(b">")
                 else:
-                    self.consumer_control.send(ConsumerControlCode.VOLUME_DECREMENT)
+                    usb_cdc.data.write(b"<")
                 last_encoder = encoder
             # KEYS
             events = self.keys.events.get()
@@ -156,10 +161,18 @@ class Console(MacroPad):  # type: ignore
                 print(f"incoming data: {runtime_payload}")
                 if runtime_payload == b"\x18":
                     self._reset()
+                    self.jingle()
                     return True
                 elif runtime_payload == b"\x04":
                     self._reset()
+                    self.jingle()
                     return False
+                elif runtime_payload.startswith(b"\x05"):
+                    self.beep()
+                    if not self.set_screen(runtime_payload):
+                        self._reset()
+                        self.jingle()
+                        return True
                 elif runtime_payload == b"\x07":
                     self.beep()
             time.sleep(0.01)
