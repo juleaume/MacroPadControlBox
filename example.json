@@ -1,46 +1,64 @@
 {
-  "foo": {
-    "keys": [
-      "foo_0",
-      "foo_1",
-      "foo_2",
-      "foo_3",
-      "foo_4",
-      "foo_5",
-      "foo_6",
-      "foo_7",
-      "foo_8",
-      "foo_9",
-      "foo_10",
-      "foo_11"
-    ],
-    "actions": [
-      "echo",
-      "echo",
-      "echo",
-      "echo",
-      "echo",
-      "echo",
-      "echo",
-      "echo",
-      "echo",
-      "echo",
-      "echo",
-      "echo"
-    ],
-    "values": [
-      "fii_0",
-      "fii_1",
-      "fii_2",
-      "fii_3",
-      "fii_4",
-      "fii_5",
-      "fii_6",
-      "fii_7",
-      "fii_8",
-      "fii_9",
-      "fii_10",
-      "fii_11"
-    ]
-  }
+  "foo": [
+    {
+      "name": "foo_0",
+      "action": "echo",
+      "args": "fii_0"
+    },
+    {
+      "name": "foo_1",
+      "action": "echo",
+      "args": "fii_1"
+    },
+    {
+      "name": "foo_2",
+      "action": "echo",
+      "args": "fii_2"
+    },
+    {
+      "name": "foo_3",
+      "action": "echo",
+      "args": "fii_3"
+    },
+    {
+      "name": "foo_4",
+      "action": "echo",
+      "args": "fii_4"
+    },
+    {
+      "name": "foo_5",
+      "action": "echo",
+      "args": "fii_5"
+    },
+    {
+      "name": "foo_6",
+      "action": "echo",
+      "args": "fii_6"
+    },
+    {
+      "name": "foo_7",
+      "action": "echo",
+      "args": "fii_7"
+    },
+    {
+      "name": "foo_8",
+      "action": "echo",
+      "args": "fii_8"
+    },
+    {
+      "name": "foo_9",
+      "action": "echo",
+      "args": "fii_9"
+    },
+    {
+      "name": "foo_10",
+      "action": "echo",
+      "args": "fii_10"
+    },
+    {
+      "name": "foo_11",
+      "action": "echo",
+      "args": "fii_11"
+    }
+  ]
 }

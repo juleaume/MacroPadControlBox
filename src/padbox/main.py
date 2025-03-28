@@ -5,8 +5,16 @@ import subprocess
 import sys
 import threading
 import time
+from dataclasses import dataclass
 
 from .comm import Box
+
+
+@dataclass
+class BoxAction:
+    name: str
+    action: str
+    args: str
 
 
 class Boxer:
@@ -19,13 +27,13 @@ class Boxer:
         if title not in self.configs:
             raise ValueError("Title is not in config file")
         self.title = title
-        self.config = self.configs.get(self.title)
+        self.config = [BoxAction(**box_action) for box_action in self.configs.get(self.title)]
         self.verbose = verbose
         self.supress_stdout = no_stdout
         self.supress_stderr = no_stderr
 
     def run(self) -> int:
-        keys = self.config.get("keys")
+        keys = [box_action.name for box_action in self.config]
         self.box.set_names(self.title, *keys)
         try:
             self.box.run(self.callback)
@@ -37,10 +45,13 @@ class Boxer:
 
     def callback(self, key: bytes) -> None:
         key_index = int.from_bytes(key)
-        action = self.config["actions"][key_index]
-        value = self.config["values"][key_index]
+        if key_index >= len(self.config):
+            print("Error, key not attributed")
+            return
+        action = self.config[key_index].action
+        value = self.config[key_index].args
         if self.verbose:
-            print(f"Key pressed: {self.config["keys"][key_index]} " f"-> setting {action}({value})")
+            print(f"Key pressed: {self.config[key_index].name} " f"-> setting {action}({value})")
         try:
             threading.Thread(
                 target=subprocess.run,
