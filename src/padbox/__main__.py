@@ -14,3 +14,7 @@ def main():
     args = parser.parse_args()
     b = Boxer(**vars(args))
     sys.exit(b.run())
+
+
+if __name__ == '__main__':
+    main()

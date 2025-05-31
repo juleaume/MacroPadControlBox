@@ -112,7 +112,7 @@ class Console(MacroPad):  # type: ignore
                     indicator = "+"
             time.sleep(0.5)
 
-    def run(self) -> None:
+    def run(self) -> bool:
         tone = 440
         for _ in range(3):
             self.play_tone(tone, 0.1)

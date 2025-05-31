@@ -30,15 +30,14 @@ class Boxer:
         self.supress_stdout = no_stdout
         self.supress_stderr = no_stderr
         self.context = pyudev.Context()
-        for dev in self.context.list_devices(subsystem="tty", ID_VENDOR_ID=MACROPAD_VID):
-            self.port = dev.device_node
+        self.know_ports = dict()
+        for dev in self.context.list_devices(subsystem="tty", ID_VENDOR_ID=MACROPAD_VID, ):
+            self.know_ports[dev.device_node] = None
             if self.verbose:
                 print("Device detected")
-            break
         else:
             if self.verbose:
                 print("No device detected")
-            self.port = None
         self.monitor = pyudev.Monitor.from_netlink(self.context)
         self.monitor.filter_by(subsystem="tty")
 
@@ -55,31 +54,28 @@ class Boxer:
     def event_handler(self, action: str, device: Device) -> None:
         if action == "add":
             print("Device detected", device)
-            self.port = device.device_node
-            self._observer.stop()
+            self.know_ports[device.device_node] = None
         elif action == "remove":
             print("Device removed", device)
-            self.port = None
-            self._start_observer()
+            del self.know_ports[device.device_node]
 
-    def run(self) -> int:
+    def run(self) -> None:
         keys = {title: [box_action.name for box_action in config] for title, config in self.configs.items()}
         while True:
-            if self.port is None:
-                time.sleep(0.1)
-                continue
             try:
-                box = Box(self.port, keys, self.verbose)
-            except SerialException:
-                continue
-            box.set_page()
-            try:
-                exit_normally = box.run(self.callback)
-            finally:
-                box.exit()
-            time.sleep(0.1)
-            del box
-            if exit_normally:
+                for port in self.know_ports.keys():
+                    if self.know_ports[port] is not None:
+                        time.sleep(0.1)
+                        continue
+                    try:
+                        box = self.know_ports[port] = Box(port, keys, self.verbose)
+                    except SerialException:
+                        continue
+                    threading.Thread(target=box.run, args=[self.callback], daemon=True).start()
+                    time.sleep(0.1)
+            except (KeyboardInterrupt, EOFError, RuntimeError):
+                for box in self.know_ports.values():
+                    box.exit()
                 break
 
     def callback(self, title: str, key: bytes) -> None:

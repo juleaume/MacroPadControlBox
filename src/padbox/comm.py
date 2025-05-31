@@ -35,14 +35,15 @@ class Box:
         self.title_index %= len(self.titles)
         self.set_names()
 
-    def run(self, callback: Callable[[str, bytes], ...] | None) -> bool:
+    def run(self, callback: Callable[[str, bytes], ...] | None) -> None:
+        self.set_page()
         while True:
             try:
                 key = self.serial.read(1)
             except KeyboardInterrupt:
-                return True
+                break
             except SerialException:
-                return False
+                break
             if key == b">":
                 self.set_next_page()
             elif key == b"<":
@@ -55,7 +56,7 @@ class Box:
             else:
                 if self.verbose:
                     print(f"Key pressed: {int.from_bytes(key)}")
-        return False
+        self.exit()
 
     def exit(self):
         try:
