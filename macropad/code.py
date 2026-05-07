@@ -4,12 +4,18 @@ from math import cos, pi
 import displayio
 import terminalio
 import usb_cdc
+import usb_hid
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
 from adafruit_macropad import MacroPad
+from adafruit_hid.keyboard import Keyboard
+from adafruit_hid.keycode import Keycode
 
 WHITE = 0xFFFFFF
 BLACK = 0x000000
+
+
+keyboard = Keyboard(usb_hid.devices)
 
 
 def angle_to_smooth_rgb(angle: float) -> int:
@@ -61,6 +67,7 @@ class Console(MacroPad):  # type: ignore
             )
         )
         self.display.root_group = self.group
+        self.key_commands = dict()
 
     def _reset(self) -> None:
         for i, _ in enumerate(self.group):
@@ -85,7 +92,10 @@ class Console(MacroPad):  # type: ignore
             title, *items = items
             self.group[-1].text = title
             for i, item in enumerate(items):
-                self.group[i].text = item
+                command_title, *keys = item.split(":")
+                self.group[i].text = command_title
+                if keys:
+                    self.key_commands[command_title] = keys
             return True
         except Exception as e:
             print(f"Something went wrong: {e}")
@@ -146,14 +156,18 @@ class Console(MacroPad):  # type: ignore
             # KEYS
             events = self.keys.events.get()
             if events is not None:
+                key_group = self.group[events.key_number]
                 if not events.pressed:  # key release
-                    usb_cdc.data.write(events.key_number.to_bytes(1))
+                    if key_group.text in self.key_commands.keys() is not None:
+                        keyboard.send(*[getattr(Keycode, _k) for _k in self.key_commands[key_group.text]])
+                    else:
+                        usb_cdc.data.write(events.key_number.to_bytes(1))
                     _down_key = None
-                    self.group[events.key_number].background_color = BLACK
-                    self.group[events.key_number].color = WHITE
+                    key_group.background_color = BLACK
+                    key_group.color = WHITE
                 else:
-                    self.group[events.key_number].background_color = WHITE
-                    self.group[events.key_number].color = BLACK
+                    key_group.background_color = WHITE
+                    key_group.color = BLACK
             if usb_cdc.data.in_waiting:
                 runtime_payload = usb_cdc.data.read(usb_cdc.data.in_waiting)
                 print(f"incoming data: {runtime_payload}")

@@ -31,7 +31,7 @@ class Boxer:
         self.supress_stderr = no_stderr
         self.context = pyudev.Context()
         self.know_ports = dict()
-        for dev in self.context.list_devices(subsystem="tty", ID_VENDOR_ID=MACROPAD_VID, ):
+        for dev in self.context.list_devices(subsystem="tty", ID_VENDOR_ID=MACROPAD_VID):
             self.know_ports[dev.device_node] = None
             if self.verbose:
                 print("Device detected")
@@ -59,7 +59,7 @@ class Boxer:
             print("Device removed", device)
             del self.know_ports[device.device_node]
 
-    def run(self) -> None:
+    def run(self) -> int:
         keys = {title: [box_action.name for box_action in config] for title, config in self.configs.items()}
         while True:
             try:
@@ -76,7 +76,7 @@ class Boxer:
             except (KeyboardInterrupt, EOFError, RuntimeError):
                 for box in self.know_ports.values():
                     box.exit()
-                break
+                return 0
 
     def callback(self, title: str, key: bytes) -> None:
         key_index = int.from_bytes(key)
