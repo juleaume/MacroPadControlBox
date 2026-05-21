@@ -10,7 +10,7 @@ parser.add_argument("--no-stdout", "-O", help="don't suppress stdout of subproce
 parser.add_argument("--no-stderr", "-E", help="don't suppress stderr of subprocesses", action="store_false")
 
 
-def main():
+def main() -> None:
     args = parser.parse_args()
     b = Boxer(**vars(args))
     sys.exit(b.run())

@@ -1,27 +1,17 @@
 import json
 import os
-import shlex
-import subprocess
-import sys
 import threading
 import time
-from dataclasses import dataclass
 
-import pyudev
+import pyudev  # type: ignore[import-untyped]
 from pyudev import Device
 from serial.serialutil import SerialException
 
-from .comm import Box
+from .actions import PyCharm, System
+from .comm import Box, BoxAction, Action
 
 MACROPAD_PID = "8108"
 MACROPAD_VID = "239a"
-
-
-@dataclass
-class BoxAction:
-    name: str
-    action: str
-    args: str
 
 
 class Boxer:
@@ -30,11 +20,12 @@ class Boxer:
         self.supress_stdout = no_stdout
         self.supress_stderr = no_stderr
         self.context = pyudev.Context()
-        self.know_ports = dict()
+        self.boxes: dict[str, Box] = dict()
+        self.known_ports = list()
         for dev in self.context.list_devices(subsystem="tty", ID_VENDOR_ID=MACROPAD_VID):
-            self.know_ports[dev.device_node] = None
+            self.known_ports.append(dev.device_node)
             if self.verbose:
-                print("Device detected")
+                print(f"Device detected: {dev.device_node}")
         else:
             if self.verbose:
                 print("No device detected")
@@ -46,6 +37,8 @@ class Boxer:
 
         self.configs = {title: [BoxAction(**box_action) for box_action in config] for title, config in configs.items()}
         self._start_observer()
+        self.system = System()
+        self.extensions = {"PyCharm": PyCharm()}
 
     def _start_observer(self) -> None:
         self._observer = pyudev.MonitorObserver(self.monitor, self.event_handler)
@@ -54,50 +47,50 @@ class Boxer:
     def event_handler(self, action: str, device: Device) -> None:
         if action == "add":
             print("Device detected", device)
-            self.know_ports[device.device_node] = None
+            self.known_ports.append(device.device_node)
         elif action == "remove":
             print("Device removed", device)
-            del self.know_ports[device.device_node]
+            self.known_ports.remove(device.device_node)
+            del self.boxes[device.device_node]
 
     def run(self) -> int:
-        keys = {title: [box_action.name for box_action in config] for title, config in self.configs.items()}
         while True:
             try:
-                for port in self.know_ports.keys():
-                    if self.know_ports[port] is not None:
+                for port in self.known_ports:
+                    if port in self.boxes.keys():
                         time.sleep(0.1)
                         continue
                     try:
-                        box = self.know_ports[port] = Box(port, keys, self.verbose)
+                        box = self.boxes[port] = Box(port, self.configs, self.verbose)
                     except SerialException:
                         continue
-                    threading.Thread(target=box.run, args=[self.callback], daemon=True).start()
+                    threading.Thread(target=box.run, args=[self.callback, port], daemon=True).start()
                     time.sleep(0.1)
+                time.sleep(0.5)
             except (KeyboardInterrupt, EOFError, RuntimeError):
-                for box in self.know_ports.values():
-                    box.exit()
+                for box in self.boxes.values():
+                    if box is not None:
+                        box.exit()
                 return 0
 
-    def callback(self, title: str, key: bytes) -> None:
+    def callback(self, title: str, key: bytes, port: str) -> None:
         key_index = int.from_bytes(key)
         page = self.configs[title]
         if key_index >= len(page):
-            print(f"Error, key not attributed: {key}")
+            print(f"Error, key not attributed: {key_index}")
             return
         action = page[key_index].action
-        value = page[key_index].args
-        if self.verbose:
-            print(f"Key {key_index} pressed: {page[key_index].name} " f"-> setting {action}({value})")
-        try:
-            threading.Thread(
-                target=subprocess.run,
-                args=[shlex.split(f"{action} {value}")],
-                kwargs={
-                    "stdout": subprocess.DEVNULL if self.supress_stdout else sys.stdout,
-                    "stderr": subprocess.DEVNULL if self.supress_stderr else sys.stderr,
-                },
-                daemon=True,
-            ).start()
-        except FileNotFoundError as e:
+        arguments = page[key_index].args
+        if action == Action.SYSTEM.name:
+            self.system.callback(arguments, self.supress_stdout, self.supress_stderr, self.verbose)
+        elif action == Action.GOTO.name:
+            self.boxes[port].set_specific_page(arguments)
+        elif action == Action.KEY.name or action == Action.CONSUMER.name:
             if self.verbose:
-                print(f"Error, no such program or file: {e}")
+                print("Key or consumer handled on device side")
+        elif action in self.extensions.keys():
+            self.extensions[action].callback(arguments, self.supress_stdout, self.supress_stderr, self.verbose)
+        else:
+            if self.verbose:
+                print(f"Unknown action: {action}")
+            return

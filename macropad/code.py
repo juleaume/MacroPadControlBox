@@ -7,6 +7,8 @@ import usb_cdc
 import usb_hid
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_text import label
+from adafruit_hid.consumer_control import ConsumerControl
+from adafruit_hid.consumer_control_code import ConsumerControlCode
 from adafruit_macropad import MacroPad
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
@@ -16,6 +18,7 @@ BLACK = 0x000000
 
 
 keyboard = Keyboard(usb_hid.devices)
+consumer = ConsumerControl(usb_hid.devices)
 
 
 def angle_to_smooth_rgb(angle: float) -> int:
@@ -68,6 +71,15 @@ class Console(MacroPad):  # type: ignore
         )
         self.display.root_group = self.group
         self.key_commands = dict()
+        self.ctrl_commands = dict()
+        self._serial = usb_cdc.data
+        if self._serial is None:
+            raise RuntimeError("Failed to open serial connection")
+
+    @property
+    def serial(self) -> usb_cdc.Serial:
+        assert self._serial is not None
+        return self._serial
 
     def _reset(self) -> None:
         for i, _ in enumerate(self.group):
@@ -84,18 +96,26 @@ class Console(MacroPad):  # type: ignore
 
     def set_screen(self, payload: bytes) -> bool:
         print(f"Received {payload}")
-        if not payload.startswith(b"\x05"):
+        if not payload.startswith(b"\x01"):
             return False
         payload = payload[1:]
         try:
-            items = payload.decode().split(",")
-            title, *items = items
+            self.key_commands = dict()
+            self.ctrl_commands = dict()
+            title, payload = payload.decode().split("\x02")
             self.group[-1].text = title
+            items = payload.split("\x17")
             for i, item in enumerate(items):
-                command_title, *keys = item.split(":")
-                self.group[i].text = command_title
-                if keys:
-                    self.key_commands[command_title] = keys
+                if "\x11" in item:
+                    command_title, *keys = item.split("\x11")
+                    self.group[i].text = command_title
+                    self.key_commands[i] = keys
+                elif "\x12" in item:
+                    command_title, key = item.split("\x12")
+                    self.group[i].text = command_title
+                    self.ctrl_commands[i] = key
+                else:
+                    self.group[i].text = item
             return True
         except Exception as e:
             print(f"Something went wrong: {e}")
@@ -106,9 +126,9 @@ class Console(MacroPad):  # type: ignore
         dots = ""
         indicator = "+"
         while True:
-            size = usb_cdc.data.in_waiting
+            size = self.serial.in_waiting
             if size:
-                return self.set_screen(usb_cdc.data.read(size))
+                return self.set_screen(self.serial.read(size))
             else:
                 self.group[3].text = f"connecting{dots}"
                 if dots != "...":
@@ -123,10 +143,10 @@ class Console(MacroPad):  # type: ignore
             time.sleep(0.5)
 
     def run(self) -> bool:
-        tone = 440
-        for _ in range(3):
-            self.play_tone(tone, 0.1)
-            tone *= 2
+        # tone = 440
+        # for _ in range(3):
+        #     self.play_tone(tone, 0.1)
+        #     tone *= 2
         color_angle = 0.0
         _down_key = None
         last_encoder = self.encoder
@@ -145,45 +165,47 @@ class Console(MacroPad):  # type: ignore
                 color_angle += pi / 36
             # ENCODER
             if self.encoder_switch and not last_encoder_switch:
-                usb_cdc.data.write(b".")
+                consumer.send(ConsumerControlCode.PLAY_PAUSE)
             last_encoder_switch = self.encoder_switch
             if encoder != last_encoder:
                 if encoder - last_encoder > 0:
-                    usb_cdc.data.write(b">")
+                    consumer.send(ConsumerControlCode.VOLUME_INCREMENT)
                 else:
-                    usb_cdc.data.write(b"<")
+                    consumer.send(ConsumerControlCode.VOLUME_DECREMENT)
                 last_encoder = encoder
             # KEYS
             events = self.keys.events.get()
             if events is not None:
                 key_group = self.group[events.key_number]
                 if not events.pressed:  # key release
-                    if key_group.text in self.key_commands.keys() is not None:
-                        keyboard.send(*[getattr(Keycode, _k) for _k in self.key_commands[key_group.text]])
+                    if self.key_commands.get(events.key_number) is not None:
+                        keyboard.send(*[getattr(Keycode, _k) for _k in self.key_commands[events.key_number]])
+                    elif self.ctrl_commands.get(events.key_number) is not None:
+                        consumer.send(getattr(ConsumerControlCode, self.ctrl_commands[events.key_number]))
                     else:
-                        usb_cdc.data.write(events.key_number.to_bytes(1))
+                        self.serial.write(events.key_number.to_bytes(1))
                     _down_key = None
                     key_group.background_color = BLACK
                     key_group.color = WHITE
                 else:
                     key_group.background_color = WHITE
                     key_group.color = BLACK
-            if usb_cdc.data.in_waiting:
-                runtime_payload = usb_cdc.data.read(usb_cdc.data.in_waiting)
+            if self.serial.in_waiting:
+                runtime_payload = self.serial.read(self.serial.in_waiting)
                 print(f"incoming data: {runtime_payload}")
                 if runtime_payload == b"\x18":
                     self._reset()
-                    self.jingle()
+                    # self.jingle()
                     return True
                 elif runtime_payload == b"\x04":
                     self._reset()
-                    self.jingle()
+                    # self.jingle()
                     return False
-                elif runtime_payload.startswith(b"\x05"):
-                    self.beep()
+                elif runtime_payload.startswith(b"\x01"):
+                    # self.beep()
                     if not self.set_screen(runtime_payload):
                         self._reset()
-                        self.jingle()
+                        # self.jingle()
                         return True
                 elif runtime_payload == b"\x07":
                     self.beep()
