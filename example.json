@@ -1,126 +1,292 @@
 {
-  "page 1": [
+  "SHORTCUTS": [
     {
-      "name": "foo_00",
-      "action": "echo",
-      "args": "fii_00"
+      "name": "CLEAR",
+      "action": "KEY",
+      "args": "LEFT_GUI:D"
     },
     {
-      "name": "foo_01",
-      "action": "echo",
-      "args": "fii_01"
+      "name": "PyCharm",
+      "action": "GOTO",
+      "args": "PyCharm"
     },
     {
-      "name": "foo_02",
-      "action": "echo",
-      "args": "fii_02"
+      "name": "",
+      "action": "",
+      "args": ""
     },
     {
-      "name": "foo_03",
-      "action": "echo",
-      "args": "fii_03"
+      "name": "WEB",
+      "action": "GOTO",
+      "args": "Sounds/Internet"
     },
     {
-      "name": "foo_04",
-      "action": "echo",
-      "args": "fii_04"
+      "name": "DTs",
+      "action": "GOTO",
+      "args": "DESKTOPS"
     },
     {
-      "name": "foo_05",
-      "action": "echo",
-      "args": "fii_05"
+      "name": "CTRL",
+      "action": "GOTO",
+      "args": "CONTROLS"
     },
     {
-      "name": "foo_06",
-      "action": "echo",
-      "args": "fii_06"
+      "name": "lock",
+      "action": "SYSTEM",
+      "args": "loginctl lock-session"
     },
     {
-      "name": "foo_07",
-      "action": "echo",
-      "args": "fii_07"
+      "name": "BUDS",
+      "action": "SYSTEM",
+      "args": "bluetoothctl connect <MAC>"
     },
     {
-      "name": "foo_08",
-      "action": "echo",
-      "args": "fii_08"
+      "name": "",
+      "action": "",
+      "args": ""
     },
     {
-      "name": "foo_09",
-      "action": "echo",
-      "args": "fii_09"
+      "name": "|<",
+      "action": "CONSUMER",
+      "args": "SCAN_PREVIOUS_TRACK"
     },
     {
-      "name": "foo_0a",
-      "action": "echo",
-      "args": "fii_0a"
+      "name": ">/||",
+      "action": "CONSUMER",
+      "args": "PLAY_PAUSE"
     },
     {
-      "name": "foo_0b",
-      "action": "echo",
-      "args": "fii_0b"
+      "name": ">|",
+      "action": "CONSUMER",
+      "args": "SCAN_NEXT_TRACK"
     }
   ],
-  "page 2": [
+  "PyCharm": [
     {
-      "name": "foo_10",
-      "action": "echo",
-      "args": "fii_10"
+      "name": "Home",
+      "action": "GOTO",
+      "args": "SHORTCUTS"
     },
     {
-      "name": "foo_11",
-      "action": "echo",
-      "args": "fii_11"
+      "name": "RUN",
+      "action": "KEYS",
+      "args": "LEFT_SHIFT:F10"
     },
     {
-      "name": "foo_12",
-      "action": "echo",
-      "args": "fii_12"
+      "name": "STOP",
+      "action": "KEYS",
+      "args": "LEFT_CONTROL:TWO"
     },
     {
-      "name": "foo_13",
-      "action": "echo",
-      "args": "fii_13"
+      "name": "DEBUG",
+      "action": "KEYS",
+      "args": "LEFT_SHIFT:F9"
     },
     {
-      "name": "foo_14",
-      "action": "echo",
-      "args": "fii_14"
+      "name": "STEP",
+      "action": "KEYS",
+      "args": "F8"
     },
     {
-      "name": "foo_15",
-      "action": "echo",
-      "args": "fii_15"
+      "name": "STEP IN",
+      "action": "KEYS",
+      "args": "F9"
     },
     {
-      "name": "foo_16",
-      "action": "echo",
-      "args": "fii_16"
+      "name": "TERM",
+      "action": "PyCharm",
+      "args": "ActivateTerminalToolWindow"
     },
     {
-      "name": "foo_17",
-      "action": "echo",
-      "args": "fii_17"
+      "name": "PYTERM",
+      "action": "PyCharm",
+      "args": "ActivatePythonConsoleToolWindow"
     },
     {
-      "name": "foo_18",
-      "action": "echo",
-      "args": "fii_18"
+      "name": "RUN W",
+      "action": "PyCharm",
+      "args": "ActivateRunToolWindow"
     },
     {
-      "name": "foo_19",
-      "action": "echo",
-      "args": "fii_19"
+      "name": "CLRTRM",
+      "action": "KEYS",
+      "args": "LEFT_CONTROL:L"
     },
     {
-      "name": "foo_1a",
-      "action": "echo",
-      "args": "fii_1a"
+      "name": "RSTPY",
+      "action": "KEYS",
+      "args": "LEFT_CONTROL:FIVE"
     },
     {
-      "name": "foo_1b",
-      "action": "echo",
-      "args": "fii_1b"
+      "name": "SLCT",
+      "action": "PyCharm",
+      "args": "ChooseRunConfiguration"
+    }
+  ],
+  "CONTROLS": [
+    {
+      "name": "Home",
+      "action": "GOTO",
+      "args": "SHORTCUTS"
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "^L",
+      "action": "KEYS",
+      "args": "LEFT_CONTROL:L"
+    },
+    {
+      "name": "ALT F4",
+      "action": "KEYS",
+      "args": "LEFT_ALT:F4"
+    },
+    {
+      "name": "^D",
+      "action": "KEYS",
+      "args": "LEFT_CONTROL:D"
+    },
+    {
+      "name": "^C",
+      "action": "KEYS",
+      "args": "LEFT_CONTROL:C"
+    },
+    {
+      "name": "^V",
+      "action": "KEYS",
+      "args": "LEFT_CONTROL:V"
+    },
+    {
+      "name": "^X",
+      "action": "KEYS",
+      "args": "LEFT_CONTROL:X"
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    }
+  ],
+  "Sounds/Internet": [
+    {
+      "name": "Home",
+      "action": "GOTO",
+      "args": "SHORTCUTS"
+    },
+    {
+      "name": "FF",
+      "action": "SYSTEM",
+      "args": "firefox"
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "youtube",
+      "action": "SYSTEM",
+      "args": "firefox https://www.youtube.com/feed/subscriptions"
+    },
+    {
+      "name": "mails",
+      "action": "SYSTEM",
+      "args": "firefox https://mail.google.com/mail/u/0/#inbox"
+    },
+    {
+      "name": "Sound",
+      "action": "SYSTEM",
+      "args": "cvlc --play-and-exit path/to/musique"
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    }
+  ],
+  "DESKTOPS": [
+    {
+      "name": "Home",
+      "action": "GOTO",
+      "args": "SHORTCUTS"
+    },
+    {
+      "name": "1",
+      "action": "KEYS",
+      "args": "LEFT_CONTROL:F1"
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "2",
+      "action": "KEYS",
+      "args": "LEFT_CONTROL:F2"
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "3",
+      "action": "KEYS",
+      "args": "LEFT_CONTROL:F3"
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
+    },
+    {
+      "name": "4",
+      "action": "",
+      "args": "LEFT_CONTROL:F4"
+    },
+    {
+      "name": "",
+      "action": "",
+      "args": ""
     }
   ]
 }
