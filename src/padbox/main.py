@@ -38,7 +38,10 @@ class Boxer:
         self.configs = {title: [BoxAction(**box_action) for box_action in config] for title, config in configs.items()}
         self._start_observer()
         self.system = System()
-        self.extensions = {"PyCharm": PyCharm()}
+        try:
+            self.extensions = {"PyCharm": PyCharm()}
+        except RuntimeError:
+            self.extensions = {}
 
     def _start_observer(self) -> None:
         self._observer = pyudev.MonitorObserver(self.monitor, self.event_handler)

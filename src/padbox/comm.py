@@ -69,9 +69,9 @@ class Box:
         while True:
             try:
                 key = self.serial.read(1)
-            except (KeyboardInterrupt, SerialException):
+            except (KeyboardInterrupt, SerialException) as e:
                 if self.verbose:
-                    print(f"Broke")
+                    print(f"Broken connection: {e}")
                 break
             if self.verbose:
                 print(f"Gotten {key!r}")
