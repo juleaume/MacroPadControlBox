@@ -48,6 +48,9 @@ class Boxer:
         self._observer.start()
 
     def event_handler(self, action: str, device: Device) -> None:
+        if device.properties["ID_USB_VENDOR_ID"] != MACROPAD_VID:
+            print("Unrecognized device, skipping")
+            return
         if action == "add":
             print("Device detected", device)
             self.known_ports.append(device.device_node)
